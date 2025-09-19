@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦙 The Secret Llama Quest - Luxe Llama Co.</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(45deg, #2c3e50, #8b4513, #2c3e50, #8b4513);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .llama {
+            font-size: 8rem;
+            animation: bounce 2s infinite;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.5); }
+            to { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.8); }
+        }
+
+        .quest-text {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .stats {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .stat-line {
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .dice {
+            display: inline-block;
+            animation: roll 3s infinite;
+            margin: 0 0.5rem;
+        }
+
+        @keyframes roll {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(90deg); }
+            50% { transform: rotate(180deg); }
+            75% { transform: rotate(270deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-link {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 2px solid #ffd700;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .back-link:hover {
+            background: rgba(255, 215, 0, 0.4);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .secret-message {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-top: 2rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="llama">🦙</div>
+
+        <h1>🎲 The Secret Llama Quest 🎲</h1>
+
+        <div class="quest-text">
+            <p><strong>Congratulations, brave adventurer!</strong></p>
+            <p>You have discovered the hidden path to the legendary Llama Sanctuary! Few mortals ever find this mystical realm where the ancient alpaca wizards weave their most powerful enchantments.</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-line">🎯 <strong>Quest Completion:</strong> You rolled a Natural 20!</div>
+            <div class="stat-line">✨ <strong>Experience Gained:</strong> +500 XP</div>
+            <div class="stat-line">🏆 <strong>Achievement Unlocked:</strong> "Seeker of Hidden Paths"</div>
+            <div class="stat-line">🎁 <strong>Reward:</strong> Blessing of the Alpaca Lords</div>
+        </div>
+
+        <div class="quest-text">
+            <p>The ethereal llamas whisper ancient secrets of wool-weaving magic. You feel your Charisma increase by +3 permanently, and all future purchases grant you advantage on Fashion rolls.</p>
+
+            <p>May your journey through the realms of premium alpaca luxury be ever prosperous! <span class="dice">🎲</span></p>
+        </div>
+
+        <div class="secret-message">
+            <p>"Only those who seek the hidden paths shall find the greatest treasures." - Ancient Llama Proverb</p>
+        </div>
+
+        <a href="index.html" class="back-link">🏠 Return to the Mortal Realm</a>
+    </div>
+</body>
+</html>

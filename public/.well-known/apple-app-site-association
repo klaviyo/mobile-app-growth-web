@@ -39,6 +39,10 @@
           {
             "/": "/settings",
             "comment": "Matches Settings screen path"
+          },
+          {
+            "/": "/push",
+            "comment": "Matches Push screen path"
           }
         ]
       }
