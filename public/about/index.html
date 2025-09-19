@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Luxe Llama Co.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #faf9f7;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: #8b7355;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #d4c4a8 0%, #8b7355 100%);
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-content {
+            padding: 4rem 0;
+        }
+
+        .about-section {
+            margin-bottom: 4rem;
+        }
+
+        .about-section h2 {
+            font-size: 2rem;
+            color: #5a4a3a;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: #555;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .value-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .value-card h3 {
+            color: #5a4a3a;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .value-card p {
+            color: #666;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #d4c4a8 0%, #8b7355 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #5a4a3a;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+
+        .cta-button:hover {
+            background-color: #4a3a2a;
+        }
+
+        footer {
+            background-color: #5a4a3a;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">🦙 Luxe Llama Co.</div>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../products/index.html">Products</a></li>
+                <li><a href="index.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>About Luxe Llama Co.</h1>
+            <p>Where tradition meets luxury in sustainable alpaca wool craftsmanship</p>
+        </div>
+    </section>
+
+    <section class="about-content">
+        <div class="container">
+            <div class="about-section">
+                <h2>Our Story</h2>
+                <div class="about-text">
+                    Founded on the principle that luxury and sustainability can coexist beautifully, Luxe Llama Co. emerged from a passion for exceptional craftsmanship and ethical business practices. Our journey began when our founder discovered the incredible properties of alpaca wool during a transformative trip to the Peruvian highlands, where centuries-old textile traditions continue to thrive.
+                </div>
+                <div class="about-text">
+                    What started as a fascination with these remarkable animals and their extraordinary wool has evolved into a commitment to bringing the finest alpaca products to discerning customers who value quality, sustainability, and timeless elegance.
+                </div>
+            </div>
+
+            <div class="about-section">
+                <h2>Our Mission</h2>
+                <div class="about-text">
+                    At Luxe Llama Co., we believe that true luxury lies not just in exceptional quality, but in the positive impact we create along the way. We're dedicated to preserving traditional Andean craftsmanship while providing sustainable livelihoods for artisan communities, all while delivering products that exceed the expectations of our customers.
+                </div>
+            </div>
+
+            <div class="about-section">
+                <h2>Our Values</h2>
+                <div class="values-grid">
+                    <div class="value-card">
+                        <h3>🌱 Sustainability</h3>
+                        <p>We source our alpaca wool from ethically managed farms that prioritize animal welfare and environmental stewardship, ensuring our luxury comes with a conscience.</p>
+                    </div>
+
+                    <div class="value-card">
+                        <h3>🎨 Craftsmanship</h3>
+                        <p>Every piece is meticulously crafted by skilled artisans who have inherited generations of textile knowledge, ensuring each product is a work of art.</p>
+                    </div>
+
+                    <div class="value-card">
+                        <h3>💎 Quality</h3>
+                        <p>We use only the finest baby alpaca wool and maintain the highest standards in every aspect of production, from fiber selection to final finishing.</p>
+                    </div>
+
+                    <div class="value-card">
+                        <h3>🤝 Community</h3>
+                        <p>We work directly with artisan cooperatives, ensuring fair wages and supporting the preservation of traditional textile techniques.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container">
+            <h2>Experience Luxe Llama Quality</h2>
+            <p>Discover our collection of premium alpaca wool accessories</p>
+            <a href="../products/index.html" class="cta-button">Shop Collection</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Luxe Llama Co. - Sustainably Luxurious Since Never | <a href="../disclaimer.html" style="color: #c9a96e;">Disclaimer</a></p>
+            <div style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
+                <p>Testing Links:
+                    <a href="../.well-known/apple-app-site-association" style="color: #c9a96e; margin: 0 0.5rem;">AASA File</a> |
+                    <a href="../.well-known/assetlinks.json" style="color: #c9a96e; margin: 0 0.5rem;">App Links</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

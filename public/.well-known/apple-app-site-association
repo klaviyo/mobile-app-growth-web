@@ -1,0 +1,26 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest"],
+        "components": [
+          {
+            "/": "/",
+            "comment": "Matches home page for universal linking"
+          },
+          {
+            "/": "/products",
+            "comment": "Matches products list page (no trailing slash)"
+          },
+          {
+            "/": "/products/*",
+            "comment": "Matches all product subpages for universal linking"
+          }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest"]
+  }
+}

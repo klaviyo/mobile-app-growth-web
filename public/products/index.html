@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Luxe Llama Co.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #faf9f7;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: #8b7355;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #d4c4a8 0%, #8b7355 100%);
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .products-section {
+            padding: 4rem 0;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card h3 {
+            color: #5a4a3a;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .product-card p {
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #8b7355;
+            margin-bottom: 1rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #5a4a3a;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #4a3a2a;
+        }
+
+        footer {
+            background-color: #5a4a3a;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">🦙 Luxe Llama Co.</div>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="index.html">Products</a></li>
+                <li><a href="../about/index.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Our Premium Collection</h1>
+            <p>Discover our complete range of sustainably crafted alpaca wool accessories</p>
+        </div>
+    </section>
+
+    <section class="products-section">
+        <div class="container">
+            <div class="product-grid">
+                <div class="product-card">
+                    <h3>Himalayan Alpaca Scarf</h3>
+                    <p>Hand-woven from the finest baby alpaca wool sourced from high-altitude farms in Peru. This luxurious scarf provides unmatched warmth and sophistication for the modern professional.</p>
+                    <div class="price">$189</div>
+                    <a href="himalayan-scarf.html" class="cta-button">View Details</a>
+                </div>
+
+                <div class="product-card">
+                    <h3>Executive Alpaca Throws</h3>
+                    <p>Transform your living space with our premium alpaca throws. Each piece is carefully crafted by master artisans and perfect for both comfort and elegance in any home or office setting.</p>
+                    <div class="price">$295</div>
+                    <a href="executive-throws.html" class="cta-button">View Details</a>
+                </div>
+
+                <div class="product-card">
+                    <h3>Artisan Alpaca Gloves</h3>
+                    <p>Meticulously crafted gloves that combine traditional Andean techniques with modern design. These gloves provide superior warmth and dexterity for the discerning individual.</p>
+                    <div class="price">$125</div>
+                    <a href="artisan-gloves.html" class="cta-button">View Details</a>
+                </div>
+
+                <div class="product-card">
+                    <h3>Boardroom Alpaca Sweater</h3>
+                    <p>Our signature business-casual sweater made from premium alpaca wool. Features a contemporary cut that's perfect for important meetings and corporate events.</p>
+                    <div class="price">$345</div>
+                    <a href="boardroom-sweater.html" class="cta-button">View Details</a>
+                </div>
+
+                <div class="product-card">
+                    <h3>Luxury Alpaca Blanket Set</h3>
+                    <p>A complete bedding solution featuring our softest alpaca wool blend. This set includes a throw blanket and two matching pillowcases for the ultimate in bedroom luxury.</p>
+                    <div class="price">$450</div>
+                    <a href="luxury-blanket-set.html" class="cta-button">View Details</a>
+                </div>
+
+                <div class="product-card">
+                    <h3>Alpine Alpaca Socks</h3>
+                    <p>Experience unparalleled comfort with our premium alpaca wool socks. Naturally moisture-wicking and odor-resistant, these socks are perfect for the active professional.</p>
+                    <div class="price">$45</div>
+                    <a href="alpine-socks.html" class="cta-button">View Details</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Luxe Llama Co. - Sustainably Luxurious Since Never | <a href="../disclaimer.html" style="color: #c9a96e;">Disclaimer</a></p>
+            <div style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
+                <p>Testing Links:
+                    <a href="../.well-known/apple-app-site-association" style="color: #c9a96e; margin: 0 0.5rem;">AASA File</a> |
+                    <a href="../.well-known/assetlinks.json" style="color: #c9a96e; margin: 0 0.5rem;">App Links</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

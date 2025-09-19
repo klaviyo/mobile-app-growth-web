@@ -1,0 +1,23 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.klaviyo.sdktestapp",
+      "sha256_cert_fingerprints": [
+        "D7:5C:6E:00:A6:6E:A5:1E:73:8E:A2:0F:0C:72:65:98:01:0C:55:47:42:7F:95:E0:43:1D:EA:12:CA:C2:38:4F",
+        "AC:0C:FF:49:AD:B6:2A:EA:E5:DB:1C:95:BE:C2:65:B5:A1:B4:96:08:2F:86:82:EE:BE:B5:05:4B:8D:BE:0F:5F"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.klaviyorntestapp",
+      "sha256_cert_fingerprints": [
+        "C9:8D:F1:70:45:A9:C5:EC:EF:31:5D:F7:8D:38:CF:CE:1E:F4:A2:A8:9E:51:11:28:0F:F7:BA:F8:B4:40:49:C6"
+      ]
+    }
+  }
+]
