@@ -1,0 +1,478 @@
+<html lang="en">
+<head data-sdk-name="IAFTester"
+      data-sdk-version="0.0.0"
+      data-native-bridge-name="KlaviyoNativeBridge"
+      data-forms-data-environment="in-app"
+      data-native-bridge-handshake="[]"
+      data-klaviyo-profile="{}"
+      data-klaviyo-local-tracking="1"
+>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klaviyo In-App Form Tester</title>
+  <style>
+    div {
+      margin-bottom: 15px;
+    }
+
+    form {
+      display: inline-block;
+      min-height: 220px;
+      vertical-align: top;
+    }
+
+    .form-caption {
+      font-size: 12pt;
+      height: 4em;
+      max-width: 300px;
+      margin-bottom: 30px;
+      margin-left: 10px;
+    }
+
+    form:first-child {
+      border-right: 1px solid #ccc;
+      padding-right: 20px;
+    }
+
+    pre {
+      background-color: #f0f0f0;
+      padding: 1em;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+
+    pre span:before {
+      content: ">";
+      left: -1em;
+      position: absolute;
+    }
+
+    pre span {
+      margin-left: 1em;
+      margin-bottom: 1em;
+      display: block;
+      position: relative;
+    }
+
+    label:first-child {
+      display: inline-block;
+      margin-right: 5px;
+      min-width: 115px;
+      text-align: right;
+    }
+
+    button {
+      margin-left: 125px;
+    }
+  </style>
+  <script type="text/javascript">
+    console.log(`
+%cThanks for checking out the In-App Forms advanced testing instructions!%c
+       *
+      *      /\\
+       .  __/__\\___
+      . _   \\''/
+       (*) /_||_\\
+       .'. \\_()_/
+        |   | . \\
+        |   | .  \\
+       .'. ,\\_____'.
+%cwindow.openForm(formId)%c
+    Force open a form programmatically by its formId.
+
+%cwindow.closeForm(formId)%c
+    Close a form programmatically. If no formId is provided, all currently open forms will be closed.
+    `,
+      "font-size: 16px; color: #2a9d8f; margin: 10px", "",
+      "font-size: 12px; color: #2a9d8f; margin: 10px", "",
+      "font-size: 12px; color: #2a9d8f; margin: 10px", "",
+    );
+
+    function openForm(formId) {
+      // Open form via existing custom trigger logic
+      window._klOnsite = window._klOnsite || [];
+      window._klOnsite.push(['openForm', formId]);
+      return true
+    }
+
+    function closeForm(formId) {
+      document.head.dispatchEvent(
+        new CustomEvent(
+          'closeForm',
+          {
+            detail: {
+              formId: formId
+            }
+          }
+        )
+      )
+      return true
+    }
+
+    function profileEvent(metric, strProperties) {
+      document.head.dispatchEvent(
+        new CustomEvent(
+          'profileEvent',
+          {
+            detail: {
+              metric: metric,
+              properties: JSON.parse(strProperties)
+            }
+          }
+        )
+      )
+      return true
+    }
+
+    // Make profileEvent available globally
+    window.profileEvent = profileEvent;
+
+    if (!window._learnq)
+      window._learnq = []
+
+    //Handshake timeout in seconds
+    const timeout = 10
+    const nativeBridgeName = document.head.getAttribute("data-native-bridge-name");
+    let handShakeTimeout;
+
+    //Add native bridge handshake data from JS (easier to visualize/maintain)
+    document.head.setAttribute("data-native-bridge-handshake", JSON.stringify([
+      {type: "handShook", version: 1},
+      {type: "abort", version: 1},
+      {type: "formsDataLoaded", version: 1},
+      {type: "formWillAppear", version: 1},
+      {type: "openDeepLink", version: 2},
+      {type: "trackAggregateEvent", version: 1},
+      {type: "trackProfileEvent", version: 1},
+      {type: "formDisappeared", version: 1},
+      {type: "profileMutation", version: 1},
+      {type: "closeForm", version: 1},
+    ]));
+
+    // Simulated NativeBridge
+    window[nativeBridgeName] = {
+      postMessage: function (message) {
+        logBridgeMessage(message);
+        const {type, data} = JSON.parse(message)
+
+        switch (type) {
+          case "handShook":
+            clearTimeout(handShakeTimeout);
+            break;
+          case "abort":
+            clearTimeout(handShakeTimeout);
+            alert(`Abort: ${data.reason}`);
+            break;
+          case "formWillAppear":
+            window.formId = data.formId;
+            break;
+        }
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", onDocumentReady);
+
+    function onDocumentReady() {
+      updatePageState()
+    }
+
+    function onKlaviyoJsLoaded() {
+      localStorage.debug = "kl_in_app_forms:*"
+      updatePageState()
+      logIfIdentified()
+      if (getAssetSource()) {
+        logBridgeMessage(`// Klaviyo.js loaded with asset source: ${window.klaviyoModulesObject?.assetSource ?? "NONE!"}`);
+      }
+    }
+
+    function triggerForm() {
+      const script = document.createElement("script");
+      const companyId = getCompanyId();
+      let scriptUrl = `${getSelectedServerUrl()}/onsite/js/klaviyo.js?env=in-app&company_id=${companyId}`
+      const assetSource = getAssetSource();
+      const formType = getSelectedFormType();
+      const localTracking = getLocalTracking();
+
+      if (assetSource) {
+        scriptUrl += `&assetSource=${assetSource}`
+      }
+
+      script.id = "klaviyo-js";
+      script.src = scriptUrl;
+      script.onload = onKlaviyoJsLoaded;
+
+      localStorage.setItem("company_id", companyId);
+      localStorage.setItem("server", getSelectedServer());
+      localStorage.setItem("asset_source", assetSource);
+      localStorage.setItem("form_type", formType);
+      localStorage.setItem("local_tracking", localTracking);
+
+      document.head.setAttribute("data-forms-data-environment", formType);
+      if (localTracking === "1") {
+        document.head.setAttribute("data-klaviyo-local-tracking", "1");
+      } else {
+        document.head.removeAttribute("data-klaviyo-local-tracking");
+      }
+
+      document.head.appendChild(script);
+
+      // Simulate the handshake timeout that SDKs are expected to implement
+      handShakeTimeout = setTimeout(() => {
+        alert(`Timeout: >${timeout}s elapsed since trigger without receiving handShook event`);
+      }, timeout * 1000)
+    }
+
+    function getCompanyId() {
+      return document.getElementById("company_id").value;
+    }
+
+    function getSelectedServer() {
+      return document.querySelector('input[name="server"]:checked').value;
+    }
+
+    function getSelectedServerUrl() {
+      return getSelectedServer() === "local" ? "http://local-klaviyo.com:8080" : "https://static.klaviyo.com";
+    }
+
+    function getAssetSource() {
+      return document.getElementById("asset_source").value;
+    }
+
+    function getSelectedFormType() {
+      return document.querySelector('input[name="form-type"]:checked').value;
+    }
+
+    function getLocalTracking() {
+      return document.querySelector('input[name="local-tracking"]:checked').value;
+    }
+
+    function iafReset() {
+      // Clear the identity currently set in the cookie (__kla_id)
+      window._learnq.push(["clearIdentity"])
+
+      localStorage.removeItem("klaviyoOnsite");
+      sessionStorage.removeItem("klaviyoFormSetting");
+      updatePageState()
+      window.location.reload();
+    }
+
+    function updatePageState() {
+      const server = localStorage.getItem("server") || "prod";
+      const formType = localStorage.getItem("form_type") || "in-app";
+      const localTracking = localStorage.getItem("local_tracking") || "1";
+      document.getElementById("clear").disabled = document.head.querySelector('#klaviyo-js') === null;
+      document.getElementById("company_id").value = localStorage.getItem("company_id");
+      document.getElementById(`server-${server}`).checked = true;
+      document.getElementById("asset_source").value = localStorage.getItem("asset_source");
+      document.getElementById(`form-type-${formType}`).checked = true;
+      document.getElementById(`tracking-${localTracking}`).checked = true;
+
+      const strProfileIdentifiers = localStorage.getItem("profileIdentifiers")
+      document.head.setAttribute("data-klaviyo-profile", strProfileIdentifiers || "{}");
+
+      const profileIdentifiers = JSON.parse(strProfileIdentifiers) || {};
+      document.getElementById("clearProfile").disabled = !profileIdentifiers
+      document.getElementById("external_id").value = profileIdentifiers.external_id || "";
+      document.getElementById("email").value = profileIdentifiers.email || "";
+      document.getElementById("phone").value = profileIdentifiers.phone || "";
+      document.getElementById("anonymous_id").value = profileIdentifiers.anonymous_id || "";
+    }
+
+    function logBridgeMessage(message) {
+      console.log(`Received message from native bridge: ${message}`);
+      // document.getElementById("log").innerText += `> ${message}\n`;
+      const logItem = document.createElement("span");
+      logItem.innerText = message;
+      document.getElementById("log").appendChild(logItem)
+    }
+
+    function saveProfileIdentifiers() {
+      const profileIdentifiers = {
+        external_id: document.getElementById("external_id").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        anonymous_id: document.getElementById("anonymous_id").value,
+      };
+
+      localStorage.setItem("profileIdentifiers", JSON.stringify(profileIdentifiers));
+      updatePageState()
+      logIfIdentified()
+    }
+
+    function resetProfileIdentifiers() {
+      window._learnq.push(["clearIdentity"])
+      localStorage.setItem("profileIdentifiers", "{}")
+      updatePageState()
+      logIfIdentified()
+    }
+
+    function logIfIdentified() {
+      setTimeout(() => {
+        if (window._learnq && window._learnq.isIdentified) {
+          logBridgeMessage(`// Profile cookied: ${window._learnq.isIdentified()}`);
+        }
+      }, 100);
+    }
+
+    function triggerProfileEvent() {
+      const eventName = document.getElementById("profile_event_name").value;
+      const eventProperties = document.getElementById("profile_event_properties").value;
+      
+      try {
+        // Validate JSON
+        JSON.parse(eventProperties);
+        
+        // Trigger the profile event
+        profileEvent(eventName, eventProperties);
+        
+        logBridgeMessage(`// Triggered profile event: ${eventName} with properties: ${eventProperties}`);
+        
+      } catch (error) {
+        alert(`Invalid JSON in properties: ${error.message}`);
+      }
+    }
+  </script>
+</head>
+<body>
+<h1> Klaviyo In-App Forms Tester</h1>
+
+<div>
+  <form id="profileIdentifiers" onsubmit="saveProfileIdentifiers(); return false;">
+    <div class="form-caption">
+      Set identifiers as a data-attribute. The profile will be identified when
+      klaviyo.js loads, and observed for mutations from then on.
+    </div>
+    <div>
+      <label for="external_id">External ID:</label>
+      <input type="text" id="external_id" name="external_id" value="" title="External ID"/>
+    </div>
+
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" value="" title="Profile Email"/>
+    </div>
+
+    <div>
+      <label for="phone">Phone:</label>
+      <input type="tel" id="phone" name="phone" value="" title="Phone Number"/>
+    </div>
+
+    <div>
+      <label for="anonymous_id">Anonymous ID:</label>
+      <input type="text" id="anonymous_id" name="anonymous_id" value="" title="Anonymous ID"/>
+    </div>
+
+    <div>
+      <button id="setProfile"
+              type="submit"
+              title="Set identifiers">
+        Set Profile Attribute
+      </button>
+    </div>
+
+    <div>
+      <button id="clearProfile"
+              type="button"
+              onclick="resetProfileIdentifiers()"
+              title="Clear profile identifiers">
+        Clear Profile Attribute
+      </button>
+    </div>
+  </form>
+
+  <form id="formSettings" onsubmit="triggerForm(); return false;">
+    <div class="form-caption">
+      Configure settings prior to loading klaviyo.js .<br/>
+      Submit to append script tag to document.head. Reset to start over.
+    </div>
+    <div>
+      <label for="company_id">Company ID:</label>
+      <input type="text" maxlength="6" id="company_id" name="company_id" value="9BX3wh" title="Company ID"/>
+    </div>
+
+    <div>
+      <label>Server:</label>
+      <input type="radio" id="server-local" name="server" value="local" title="local"/>
+      <label for="server-local">Local</label>
+      <input type="radio" id="server-prod" name="server" value="prod" checked title="prod"/>
+      <label for="server-prod">Production</label>
+    </div>
+
+    <div>
+      <label for="asset_source">Asset Source:</label>
+      <input type="text" id="asset_source" name="asset_source" value="" title="Asset Source"/>
+    </div>
+
+    <div>
+      <label title="Environment from which to load full-forms data">Forms Type:</label>
+      <input type="radio" id="form-type-in-app" name="form-type" value="in-app" checked title="In-App"/>
+      <label for="form-type-in-app">In-App</label>
+      <input type="radio" id="form-type-web" name="form-type" value="web" title="Web"/>
+      <label for="form-type-web">Web</label>
+    </div>
+
+    <div>
+      <label title="Whether to allow client/* API calls">Tracking:</label>
+      <input type="radio" id="tracking-1" name="local-tracking" value="1" checked title="API calls blocked"/>
+      <label for="tracking-1">Block API calls</label>
+      <input type="radio" id="tracking-0" name="local-tracking" value="0" title="API calls permitted"/>
+      <label for="tracking-0">Allow</label>
+    </div>
+
+    <div>
+      <button id="trigger"
+              type="submit"
+              title="Load klaviyo.js and trigger a form">
+        Load Klaviyo.js
+      </button>
+    </div>
+
+    <div>
+      <button id="clear"
+              type="button"
+              onclick="iafReset()"
+              title="Clear klaviyoOnsite from localStorage and klaviyoFormSetting from sessionStorage">
+        Reset
+      </button>
+    </div>
+  </form>
+</div>
+
+<div>
+  <div id="profileEventTester">
+    <div class="form-caption">
+      Test triggering forms by profile events.<br/>
+      Enter an event name and properties to simulate a profile event.
+    </div>
+    <div>
+      <label for="profile_event_name">Event Name:</label>
+      <input type="text" id="profile_event_name" name="profile_event_name" value="Viewed Product" title="Profile Event Name"/>
+    </div>
+
+    <div>
+      <label for="profile_event_properties">Event Properties (JSON):</label>
+      <textarea id="profile_event_properties" name="profile_event_properties" rows="4" cols="50" title="Profile Event Properties as JSON">{}</textarea>
+    </div>
+
+    <div>
+      <button id="triggerProfileEvent"
+              type="button"
+              onclick="triggerProfileEvent()"
+              title="Trigger profile event">
+        Trigger Profile Event
+      </button>
+    </div>
+  </div>
+</div>
+
+<div>
+  Some commands can't be tested from the UI without conflicting with the displayed form.<br/>
+  Open the JS console for further instructions!
+</div>
+<h2 style="font-family: monospace">NativeBridge Messages:</h2>
+<pre id="log">
+</pre>
+
+</body>
+</html>

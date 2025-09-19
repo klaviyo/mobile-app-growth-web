@@ -33,3 +33,6 @@
 - AASA files must be served from `/.well-known/apple-app-site-association`
 - App links files served from `/.well-known/assetlinks.json`
 - Keep mobile app testing requirements in mind when making changes
+
+## Special Commands
+- **Update the In App Forms tester**: Copy `~/Klaviyo/Repos/fender/client/onsite/onsite-in-app-forms/test/iaf-tester.html` to `./public/` directory (replace if exists)

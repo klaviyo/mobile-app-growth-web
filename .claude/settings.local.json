@@ -4,7 +4,9 @@
       "Read(//Users/evan.masseau/Projects/masseau.menswear/**)",
       "Bash(open:*)",
       "Bash(git remote add:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
