@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Log - Luxe Llama Co.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #faf9f7;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: #8b7355;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #d4c4a8 0%, #8b7355 100%);
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .log-content {
+            padding: 4rem 0;
+        }
+
+        .log-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .request-item {
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .request-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 80px 100px 1fr 100px 80px;
+            gap: 1rem;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .request-header:hover {
+            background: #e9ecef;
+        }
+
+        .request-method {
+            background: #28a745;
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .request-method.post {
+            background: #007bff;
+        }
+
+        .request-method.put {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .request-method.delete {
+            background: #dc3545;
+        }
+
+        .request-status {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-200 { color: #28a745; }
+        .status-400 { color: #ffc107; }
+        .status-500 { color: #dc3545; }
+
+        .request-url {
+            color: #333;
+            font-family: monospace;
+        }
+
+        .request-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .request-duration {
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .request-details {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: none;
+        }
+
+        .request-details.expanded {
+            display: block;
+        }
+
+        .detail-section {
+            margin-bottom: 1rem;
+        }
+
+        .detail-section h4 {
+            color: #5a4a3a;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-content {
+            background: white;
+            padding: 0.8rem;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            border: 1px solid #ddd;
+        }
+
+        .filters {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-button {
+            padding: 0.5rem 1rem;
+            border: 2px solid #d4c4a8;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-button.active {
+            background: #8b7355;
+            color: white;
+        }
+
+        footer {
+            background-color: #5a4a3a;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .request-header {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">🦙 Luxe Llama Co.</div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products/index.html">Products</a></li>
+                <li><a href="about/index.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Request Log</h1>
+            <p>Detailed API request and response monitoring</p>
+        </div>
+    </section>
+
+    <section class="log-content">
+        <div class="container">
+            <div class="filters">
+                <div class="filter-button active">All Requests</div>
+                <div class="filter-button">GET</div>
+                <div class="filter-button">POST</div>
+                <div class="filter-button">Errors Only</div>
+            </div>
+
+            <div class="log-container">
+                <div class="request-item">
+                    <div class="request-header" onclick="toggleDetails(this)">
+                        <div class="request-method">GET</div>
+                        <div class="request-status status-200">200</div>
+                        <div class="request-url">/api/products/himalayan-scarf</div>
+                        <div class="request-time">11:32:15</div>
+                        <div class="request-duration">234ms</div>
+                    </div>
+                    <div class="request-details">
+                        <div class="detail-section">
+                            <h4>Request Headers</h4>
+                            <div class="detail-content">
+Accept: application/json<br>
+User-Agent: LuxeLlamaApp/1.0<br>
+Authorization: Bearer llama_token_123
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Response</h4>
+                            <div class="detail-content">
+{<br>
+  "id": "himalayan-scarf",<br>
+  "name": "Himalayan Alpaca Scarf",<br>
+  "price": 189,<br>
+  "woolGrade": "Premium Baby Alpaca"<br>
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="request-item">
+                    <div class="request-header" onclick="toggleDetails(this)">
+                        <div class="request-method post">POST</div>
+                        <div class="request-status status-200">201</div>
+                        <div class="request-url">/api/events/track</div>
+                        <div class="request-time">11:28:42</div>
+                        <div class="request-duration">156ms</div>
+                    </div>
+                    <div class="request-details">
+                        <div class="detail-section">
+                            <h4>Request Body</h4>
+                            <div class="detail-content">
+{<br>
+  "event": "page_view",<br>
+  "properties": {<br>
+    "page": "/products/executive-throws",<br>
+    "user_id": "llama_enthusiast_001"<br>
+  }<br>
+}
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Response</h4>
+                            <div class="detail-content">
+{<br>
+  "status": "success",<br>
+  "event_id": "evt_alpaca_123"<br>
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="request-item">
+                    <div class="request-header" onclick="toggleDetails(this)">
+                        <div class="request-method">GET</div>
+                        <div class="request-status status-200">200</div>
+                        <div class="request-url">/.well-known/apple-app-site-association</div>
+                        <div class="request-time">11:25:33</div>
+                        <div class="request-duration">45ms</div>
+                    </div>
+                    <div class="request-details">
+                        <div class="detail-section">
+                            <h4>Response Headers</h4>
+                            <div class="detail-content">
+Content-Type: application/json<br>
+Cache-Control: max-age=3600<br>
+Content-Length: 667
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Response (AASA File)</h4>
+                            <div class="detail-content">
+{<br>
+  "applinks": {<br>
+    "details": [{<br>
+      "appIDs": ["G3793W2RJ2.com.klaviyo.SDKTestApp"]<br>
+    }]<br>
+  }<br>
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="request-item">
+                    <div class="request-header" onclick="toggleDetails(this)">
+                        <div class="request-method post">POST</div>
+                        <div class="request-status status-400">400</div>
+                        <div class="request-url">/api/forms/submit</div>
+                        <div class="request-time">11:08:13</div>
+                        <div class="request-duration">89ms</div>
+                    </div>
+                    <div class="request-details">
+                        <div class="detail-section">
+                            <h4>Request Body</h4>
+                            <div class="detail-content">
+{<br>
+  "form_id": "contact_form",<br>
+  "email": "invalid-email",<br>
+  "message": "I love alpacas!"<br>
+}
+                            </div>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Error Response</h4>
+                            <div class="detail-content">
+{<br>
+  "error": "Invalid email format",<br>
+  "code": "VALIDATION_ERROR",<br>
+  "field": "email"<br>
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="request-item">
+                    <div class="request-header" onclick="toggleDetails(this)">
+                        <div class="request-method">GET</div>
+                        <div class="request-status status-200">200</div>
+                        <div class="request-url">/api/llama/wellness-check</div>
+                        <div class="request-time">11:12:55</div>
+                        <div class="request-duration">1.2s</div>
+                    </div>
+                    <div class="request-details">
+                        <div class="detail-section">
+                            <h4>Response</h4>
+                            <div class="detail-content">
+{<br>
+  "status": "all_llamas_happy",<br>
+  "wool_quality": "premium",<br>
+  "happiness_index": 98.7,<br>
+  "last_feeding": "2024-09-19T10:30:00Z"<br>
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Luxe Llama Co. - Sustainably Luxurious Since Never | <a href="disclaimer.html" style="color: #c9a96e;">Disclaimer</a></p>
+            <div style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
+                <p>Testing Links:
+                    <a href=".well-known/apple-app-site-association" style="color: #c9a96e; margin: 0 0.5rem;">AASA File</a> |
+                    <a href=".well-known/assetlinks.json" style="color: #c9a96e; margin: 0 0.5rem;">App Links</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleDetails(header) {
+            const details = header.nextElementSibling;
+            details.classList.toggle('expanded');
+        }
+    </script>
+</body>
+</html>

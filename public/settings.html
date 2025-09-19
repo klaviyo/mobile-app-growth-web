@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Luxe Llama Co.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #faf9f7;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: #8b7355;
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.8;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, #d4c4a8 0%, #8b7355 100%);
+            color: white;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .settings-content {
+            padding: 4rem 0;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 3rem;
+        }
+
+        .settings-sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .settings-nav {
+            list-style: none;
+        }
+
+        .settings-nav li {
+            margin-bottom: 1rem;
+        }
+
+        .settings-nav a {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: #5a4a3a;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .settings-nav a:hover,
+        .settings-nav a.active {
+            background: #d4c4a8;
+            color: #5a4a3a;
+        }
+
+        .settings-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 3rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .panel-section {
+            margin-bottom: 3rem;
+        }
+
+        .panel-section h3 {
+            color: #5a4a3a;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-info h4 {
+            color: #5a4a3a;
+            margin-bottom: 0.3rem;
+        }
+
+        .setting-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .setting-control {
+            margin-left: 2rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: #ccc;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #8b7355;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active::after {
+            transform: translateX(25px);
+        }
+
+        .setting-select {
+            padding: 0.5rem;
+            border: 2px solid #d4c4a8;
+            border-radius: 5px;
+            background: white;
+            min-width: 150px;
+        }
+
+        .setting-input {
+            padding: 0.5rem;
+            border: 2px solid #d4c4a8;
+            border-radius: 5px;
+            background: white;
+            min-width: 200px;
+        }
+
+        .danger-zone {
+            border: 2px solid #dc3545;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .danger-zone h3 {
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+
+        .danger-button {
+            background: #dc3545;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .save-button {
+            background: #8b7355;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 2rem;
+        }
+
+        footer {
+            background-color: #5a4a3a;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">🦙 Luxe Llama Co.</div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products/index.html">Products</a></li>
+                <li><a href="about/index.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Settings</h1>
+            <p>Customize your alpaca wool experience</p>
+        </div>
+    </section>
+
+    <section class="settings-content">
+        <div class="container">
+            <div class="settings-grid">
+                <div class="settings-sidebar">
+                    <ul class="settings-nav">
+                        <li><a href="#general" class="active">General</a></li>
+                        <li><a href="#notifications">Notifications</a></li>
+                        <li><a href="#privacy">Privacy</a></li>
+                        <li><a href="#preferences">Preferences</a></li>
+                        <li><a href="#account">Account</a></li>
+                    </ul>
+                </div>
+
+                <div class="settings-panel">
+                    <div class="panel-section">
+                        <h3>General Settings</h3>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Language</h4>
+                                <p>Select your preferred language for the interface</p>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option>English (Alpaca)</option>
+                                    <option>Spanish (Llama)</option>
+                                    <option>Quechua (Native)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Theme</h4>
+                                <p>Choose your preferred color scheme</p>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option>Alpaca Earth Tones</option>
+                                    <option>Llama Light</option>
+                                    <option>Vicuña Dark</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Currency</h4>
+                                <p>Display prices in your local currency</p>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option>USD ($)</option>
+                                    <option>EUR (€)</option>
+                                    <option>Alpaca Coins (🦙)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h3>Notifications</h3>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Email Notifications</h4>
+                                <p>Receive updates about new alpaca products</p>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Alpaca Wellness Updates</h4>
+                                <p>Get notifications about our alpacas' well-being</p>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Wool Quality Alerts</h4>
+                                <p>Be notified when premium wool becomes available</p>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch" onclick="toggleSwitch(this)"></div>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Push Notifications</h4>
+                                <p>Receive mobile notifications for urgent alpaca news</p>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSwitch(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-section">
+                        <h3>Alpaca Preferences</h3>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Preferred Wool Grade</h4>
+                                <p>Set your default wool quality preference</p>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option>Royal Baby Alpaca</option>
+                                    <option>Super Fine Alpaca</option>
+                                    <option>Fine Alpaca</option>
+                                    <option>Medium Alpaca</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Color Preferences</h4>
+                                <p>Your favorite alpaca wool colors</p>
+                            </div>
+                            <div class="setting-control">
+                                <input type="text" class="setting-input" value="Natural, Vicuña, Fawn" readonly>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Auto-reorder Threshold</h4>
+                                <p>Automatically suggest reorders based on usage</p>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option>Never</option>
+                                    <option>After 6 months</option>
+                                    <option>After 1 year</option>
+                                    <option>When llamas get lonely</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="danger-zone">
+                        <h3>⚠️ Danger Zone</h3>
+                        <p style="color: #666; margin-bottom: 1rem;">These actions cannot be undone. Please be careful.</p>
+                        <button class="danger-button">Reset All Preferences</button>
+                        <button class="danger-button" style="margin-left: 1rem;">Delete Account Data</button>
+                    </div>
+
+                    <button class="save-button">Save All Changes</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Luxe Llama Co. - Sustainably Luxurious Since Never | <a href="disclaimer.html" style="color: #c9a96e;">Disclaimer</a></p>
+            <div style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
+                <p>Testing Links:
+                    <a href=".well-known/apple-app-site-association" style="color: #c9a96e; margin: 0 0.5rem;">AASA File</a> |
+                    <a href=".well-known/assetlinks.json" style="color: #c9a96e; margin: 0 0.5rem;">App Links</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleSwitch(element) {
+            element.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

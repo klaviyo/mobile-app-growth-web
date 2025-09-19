@@ -15,6 +15,30 @@
           {
             "/": "/products/*",
             "comment": "Matches all product subpages for universal linking"
+          },
+          {
+            "/": "/accountInfo",
+            "comment": "Matches Account screen path"
+          },
+          {
+            "/": "/profile",
+            "comment": "Matches Profile screen path"
+          },
+          {
+            "/": "/events",
+            "comment": "Matches Events (API Traffic) screen path"
+          },
+          {
+            "/": "/requestLog",
+            "comment": "Matches Request Log screen path"
+          },
+          {
+            "/": "/forms",
+            "comment": "Matches Forms screen path"
+          },
+          {
+            "/": "/settings",
+            "comment": "Matches Settings screen path"
           }
         ]
       }
