@@ -1,400 +1,478 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forms - Luxe Llama Co.</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<head data-sdk-name="IAFTester"
+      data-sdk-version="0.0.0"
+      data-native-bridge-name="KlaviyoNativeBridge"
+      data-forms-data-environment="in-app"
+      data-native-bridge-handshake="[]"
+      data-klaviyo-profile="{}"
+      data-klaviyo-local-tracking="1"
+>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klaviyo In-App Form Tester</title>
+  <style>
+    div {
+      margin-bottom: 15px;
+    }
 
-        body {
-            font-family: 'Georgia', serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #faf9f7;
-        }
+    form {
+      display: inline-block;
+      min-height: 220px;
+      vertical-align: top;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+    .form-caption {
+      font-size: 12pt;
+      height: 4em;
+      max-width: 300px;
+      margin-bottom: 30px;
+      margin-left: 10px;
+    }
 
-        header {
-            background-color: #8b7355;
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+    form:first-child {
+      border-right: 1px solid #ccc;
+      padding-right: 20px;
+    }
 
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    pre {
+      background-color: #f0f0f0;
+      padding: 1em;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-        }
+    pre span:before {
+      content: ">";
+      left: -1em;
+      position: absolute;
+    }
 
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
+    pre span {
+      margin-left: 1em;
+      margin-bottom: 1em;
+      display: block;
+      position: relative;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            transition: opacity 0.3s;
-        }
+    label:first-child {
+      display: inline-block;
+      margin-right: 5px;
+      min-width: 115px;
+      text-align: right;
+    }
 
-        nav a:hover {
-            opacity: 0.8;
-        }
+    button {
+      margin-left: 125px;
+    }
+  </style>
+  <script type="text/javascript">
+    console.log(`
+%cThanks for checking out the In-App Forms advanced testing instructions!%c
+       *
+      *      /\\
+       .  __/__\\___
+      . _   \\''/
+       (*) /_||_\\
+       .'. \\_()_/
+        |   | . \\
+        |   | .  \\
+       .'. ,\\_____'.
+%cwindow.openForm(formId)%c
+    Force open a form programmatically by its formId.
 
-        .page-header {
-            text-align: center;
-            padding: 3rem 0;
-            background: linear-gradient(135deg, #d4c4a8 0%, #8b7355 100%);
-            color: white;
-        }
+%cwindow.closeForm(formId)%c
+    Close a form programmatically. If no formId is provided, all currently open forms will be closed.
+    `,
+      "font-size: 16px; color: #2a9d8f; margin: 10px", "",
+      "font-size: 12px; color: #2a9d8f; margin: 10px", "",
+      "font-size: 12px; color: #2a9d8f; margin: 10px", "",
+    );
 
-        .page-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
+    function openForm(formId) {
+      // Open form via existing custom trigger logic
+      window._klOnsite = window._klOnsite || [];
+      window._klOnsite.push(['openForm', formId]);
+      return true
+    }
 
-        .forms-content {
-            padding: 4rem 0;
-        }
+    function closeForm(formId) {
+      document.head.dispatchEvent(
+        new CustomEvent(
+          'closeForm',
+          {
+            detail: {
+              formId: formId
+            }
+          }
+        )
+      )
+      return true
+    }
 
-        .forms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-        }
+    function profileEvent(metric, strProperties) {
+      document.head.dispatchEvent(
+        new CustomEvent(
+          'profileEvent',
+          {
+            detail: {
+              metric: metric,
+              properties: JSON.parse(strProperties)
+            }
+          }
+        )
+      )
+      return true
+    }
 
-        .form-card {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
+    // Make profileEvent available globally
+    window.profileEvent = profileEvent;
 
-        .form-card h3 {
-            color: #5a4a3a;
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-        }
+    if (!window._learnq)
+      window._learnq = []
 
-        .form-card p {
-            color: #666;
-            margin-bottom: 2rem;
-        }
+    //Handshake timeout in seconds
+    const timeout = 10
+    const nativeBridgeName = document.head.getAttribute("data-native-bridge-name");
+    let handShakeTimeout;
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+    //Add native bridge handshake data from JS (easier to visualize/maintain)
+    document.head.setAttribute("data-native-bridge-handshake", JSON.stringify([
+      {type: "handShook", version: 1},
+      {type: "abort", version: 1},
+      {type: "formsDataLoaded", version: 1},
+      {type: "formWillAppear", version: 1},
+      {type: "openDeepLink", version: 2},
+      {type: "trackAggregateEvent", version: 1},
+      {type: "trackProfileEvent", version: 1},
+      {type: "formDisappeared", version: 1},
+      {type: "profileMutation", version: 1},
+      {type: "closeForm", version: 1},
+    ]));
 
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #5a4a3a;
-            font-weight: bold;
-        }
+    // Simulated NativeBridge
+    window[nativeBridgeName] = {
+      postMessage: function (message) {
+        logBridgeMessage(message);
+        const {type, data} = JSON.parse(message)
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.8rem;
-            border: 2px solid #d4c4a8;
-            border-radius: 5px;
-            font-family: inherit;
-            background-color: #f9f9f9;
+        switch (type) {
+          case "handShook":
+            clearTimeout(handShakeTimeout);
+            break;
+          case "abort":
+            clearTimeout(handShakeTimeout);
+            alert(`Abort: ${data.reason}`);
+            break;
+          case "formWillAppear":
+            window.formId = data.formId;
+            break;
         }
+      }
+    }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #8b7355;
-        }
+    document.addEventListener("DOMContentLoaded", onDocumentReady);
 
-        .form-button {
-            background-color: #8b7355;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-            width: 100%;
-        }
+    function onDocumentReady() {
+      updatePageState()
+    }
 
-        .form-button:hover {
-            background-color: #5a4a3a;
-        }
+    function onKlaviyoJsLoaded() {
+      localStorage.debug = "kl_in_app_forms:*"
+      updatePageState()
+      logIfIdentified()
+      if (getAssetSource()) {
+        logBridgeMessage(`// Klaviyo.js loaded with asset source: ${window.klaviyoModulesObject?.assetSource ?? "NONE!"}`);
+      }
+    }
 
-        .form-stats {
-            background: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 3rem;
-        }
+    function triggerForm() {
+      const script = document.createElement("script");
+      const companyId = getCompanyId();
+      let scriptUrl = `${getSelectedServerUrl()}/onsite/js/klaviyo.js?env=in-app&company_id=${companyId}`
+      const assetSource = getAssetSource();
+      const formType = getSelectedFormType();
+      const localTracking = getLocalTracking();
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
+      if (assetSource) {
+        scriptUrl += `&assetSource=${assetSource}`
+      }
 
-        .stat-item {
-            padding: 1rem;
-        }
+      script.id = "klaviyo-js";
+      script.src = scriptUrl;
+      script.onload = onKlaviyoJsLoaded;
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #8b7355;
-        }
+      localStorage.setItem("company_id", companyId);
+      localStorage.setItem("server", getSelectedServer());
+      localStorage.setItem("asset_source", assetSource);
+      localStorage.setItem("form_type", formType);
+      localStorage.setItem("local_tracking", localTracking);
 
-        .stat-label {
-            color: #666;
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-        }
+      document.head.setAttribute("data-forms-data-environment", formType);
+      if (localTracking === "1") {
+        document.head.setAttribute("data-klaviyo-local-tracking", "1");
+      } else {
+        document.head.removeAttribute("data-klaviyo-local-tracking");
+      }
 
-        .form-status {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin-top: 1rem;
-        }
+      document.head.appendChild(script);
 
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
+      // Simulate the handshake timeout that SDKs are expected to implement
+      handShakeTimeout = setTimeout(() => {
+        alert(`Timeout: >${timeout}s elapsed since trigger without receiving handShook event`);
+      }, timeout * 1000)
+    }
 
-        .status-draft {
-            background: #fff3cd;
-            color: #856404;
-        }
+    function getCompanyId() {
+      return document.getElementById("company_id").value;
+    }
 
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
+    function getSelectedServer() {
+      return document.querySelector('input[name="server"]:checked').value;
+    }
 
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-        }
+    function getSelectedServerUrl() {
+      return getSelectedServer() === "local" ? "http://local-klaviyo.com:8080" : "https://static.klaviyo.com";
+    }
 
-        footer {
-            background-color: #5a4a3a;
-            color: white;
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 4rem;
+    function getAssetSource() {
+      return document.getElementById("asset_source").value;
+    }
+
+    function getSelectedFormType() {
+      return document.querySelector('input[name="form-type"]:checked').value;
+    }
+
+    function getLocalTracking() {
+      return document.querySelector('input[name="local-tracking"]:checked').value;
+    }
+
+    function iafReset() {
+      // Clear the identity currently set in the cookie (__kla_id)
+      window._learnq.push(["clearIdentity"])
+
+      localStorage.removeItem("klaviyoOnsite");
+      sessionStorage.removeItem("klaviyoFormSetting");
+      updatePageState()
+      window.location.reload();
+    }
+
+    function updatePageState() {
+      const server = localStorage.getItem("server") || "prod";
+      const formType = localStorage.getItem("form_type") || "in-app";
+      const localTracking = localStorage.getItem("local_tracking") || "1";
+      document.getElementById("clear").disabled = document.head.querySelector('#klaviyo-js') === null;
+      document.getElementById("company_id").value = localStorage.getItem("company_id");
+      document.getElementById(`server-${server}`).checked = true;
+      document.getElementById("asset_source").value = localStorage.getItem("asset_source");
+      document.getElementById(`form-type-${formType}`).checked = true;
+      document.getElementById(`tracking-${localTracking}`).checked = true;
+
+      const strProfileIdentifiers = localStorage.getItem("profileIdentifiers")
+      document.head.setAttribute("data-klaviyo-profile", strProfileIdentifiers || "{}");
+
+      const profileIdentifiers = JSON.parse(strProfileIdentifiers) || {};
+      document.getElementById("clearProfile").disabled = !profileIdentifiers
+      document.getElementById("external_id").value = profileIdentifiers.external_id || "";
+      document.getElementById("email").value = profileIdentifiers.email || "";
+      document.getElementById("phone").value = profileIdentifiers.phone || "";
+      document.getElementById("anonymous_id").value = profileIdentifiers.anonymous_id || "";
+    }
+
+    function logBridgeMessage(message) {
+      console.log(`Received message from native bridge: ${message}`);
+      // document.getElementById("log").innerText += `> ${message}\n`;
+      const logItem = document.createElement("span");
+      logItem.innerText = message;
+      document.getElementById("log").appendChild(logItem)
+    }
+
+    function saveProfileIdentifiers() {
+      const profileIdentifiers = {
+        external_id: document.getElementById("external_id").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        anonymous_id: document.getElementById("anonymous_id").value,
+      };
+
+      localStorage.setItem("profileIdentifiers", JSON.stringify(profileIdentifiers));
+      updatePageState()
+      logIfIdentified()
+    }
+
+    function resetProfileIdentifiers() {
+      window._learnq.push(["clearIdentity"])
+      localStorage.setItem("profileIdentifiers", "{}")
+      updatePageState()
+      logIfIdentified()
+    }
+
+    function logIfIdentified() {
+      setTimeout(() => {
+        if (window._learnq && window._learnq.isIdentified) {
+          logBridgeMessage(`// Profile cookied: ${window._learnq.isIdentified()}`);
         }
-    </style>
+      }, 100);
+    }
+
+    function triggerProfileEvent() {
+      const eventName = document.getElementById("profile_event_name").value;
+      const eventProperties = document.getElementById("profile_event_properties").value;
+      
+      try {
+        // Validate JSON
+        JSON.parse(eventProperties);
+        
+        // Trigger the profile event
+        profileEvent(eventName, eventProperties);
+        
+        logBridgeMessage(`// Triggered profile event: ${eventName} with properties: ${eventProperties}`);
+        
+      } catch (error) {
+        alert(`Invalid JSON in properties: ${error.message}`);
+      }
+    }
+  </script>
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">🦙 Luxe Llama Co.</div>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products/index.html">Products</a></li>
-                <li><a href="about/index.html">About</a></li>
-            </ul>
-        </nav>
-    </header>
+<h1> Klaviyo In-App Forms Tester</h1>
 
-    <section class="page-header">
-        <div class="container">
-            <h1>Forms Management</h1>
-            <p>Manage contact forms and customer feedback collection</p>
-        </div>
-    </section>
+<div>
+  <form id="profileIdentifiers" onsubmit="saveProfileIdentifiers(); return false;">
+    <div class="form-caption">
+      Set identifiers as a data-attribute. The profile will be identified when
+      klaviyo.js loads, and observed for mutations from then on.
+    </div>
+    <div>
+      <label for="external_id">External ID:</label>
+      <input type="text" id="external_id" name="external_id" value="" title="External ID"/>
+    </div>
 
-    <section class="forms-content">
-        <div class="container">
-            <div class="form-stats">
-                <h3 style="text-align: center; margin-bottom: 2rem; color: #5a4a3a;">Form Analytics</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">1,234</div>
-                        <div class="stat-label">Total Submissions</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">4</div>
-                        <div class="stat-label">Active Forms</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">89%</div>
-                        <div class="stat-label">Completion Rate</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">24</div>
-                        <div class="stat-label">Today's Submissions</div>
-                    </div>
-                </div>
-            </div>
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" value="" title="Profile Email"/>
+    </div>
 
-            <div class="forms-grid">
-                <div class="form-card">
-                    <h3>Contact Form</h3>
-                    <p>Main customer contact and inquiry form for alpaca wool enthusiasts.</p>
-                    <div class="form-status status-active">Active</div>
+    <div>
+      <label for="phone">Phone:</label>
+      <input type="tel" id="phone" name="phone" value="" title="Phone Number"/>
+    </div>
 
-                    <form style="margin-top: 2rem;">
-                        <div class="form-group">
-                            <label>Full Name</label>
-                            <input type="text" placeholder="Enter your name" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" placeholder="your@email.com" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Alpaca Interest Level</label>
-                            <select disabled>
-                                <option>Casual Admirer</option>
-                                <option>Wool Enthusiast</option>
-                                <option>Alpaca Obsessed</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Message</label>
-                            <textarea rows="3" placeholder="Tell us about your alpaca dreams..." readonly></textarea>
-                        </div>
-                        <button type="button" class="form-button">Submit (Demo Only)</button>
-                    </form>
-                </div>
+    <div>
+      <label for="anonymous_id">Anonymous ID:</label>
+      <input type="text" id="anonymous_id" name="anonymous_id" value="" title="Anonymous ID"/>
+    </div>
 
-                <div class="form-card">
-                    <h3>Newsletter Signup</h3>
-                    <p>Subscribe to our weekly alpaca wool updates and premium product announcements.</p>
-                    <div class="form-status status-active">Active</div>
+    <div>
+      <button id="setProfile"
+              type="submit"
+              title="Set identifiers">
+        Set Profile Attribute
+      </button>
+    </div>
 
-                    <form style="margin-top: 2rem;">
-                        <div class="form-group">
-                            <label>Email Address</label>
-                            <input type="email" placeholder="your@email.com" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Preferred Wool Type</label>
-                            <select disabled>
-                                <option>Baby Alpaca</option>
-                                <option>Super Fine Alpaca</option>
-                                <option>Alpaca Blend</option>
-                                <option>All Types</option>
-                            </select>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" disabled>
-                            <label>Send me alpaca care tips</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" disabled>
-                            <label>Notify about new llama arrivals</label>
-                        </div>
-                        <button type="button" class="form-button">Subscribe (Demo Only)</button>
-                    </form>
-                </div>
+    <div>
+      <button id="clearProfile"
+              type="button"
+              onclick="resetProfileIdentifiers()"
+              title="Clear profile identifiers">
+        Clear Profile Attribute
+      </button>
+    </div>
+  </form>
 
-                <div class="form-card">
-                    <h3>Product Review</h3>
-                    <p>Share your experience with our premium alpaca wool products.</p>
-                    <div class="form-status status-active">Active</div>
+  <form id="formSettings" onsubmit="triggerForm(); return false;">
+    <div class="form-caption">
+      Configure settings prior to loading klaviyo.js .<br/>
+      Submit to append script tag to document.head. Reset to start over.
+    </div>
+    <div>
+      <label for="company_id">Company ID:</label>
+      <input type="text" maxlength="6" id="company_id" name="company_id" value="9BX3wh" title="Company ID"/>
+    </div>
 
-                    <form style="margin-top: 2rem;">
-                        <div class="form-group">
-                            <label>Product Purchased</label>
-                            <select disabled>
-                                <option>Himalayan Alpaca Scarf</option>
-                                <option>Executive Alpaca Throws</option>
-                                <option>Artisan Alpaca Gloves</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Rating</label>
-                            <select disabled>
-                                <option>⭐⭐⭐⭐⭐ Exceptionally Soft</option>
-                                <option>⭐⭐⭐⭐ Very Luxurious</option>
-                                <option>⭐⭐⭐ Good Quality</option>
-                                <option>⭐⭐ Average</option>
-                                <option>⭐ Needs Improvement</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Review</label>
-                            <textarea rows="4" placeholder="How was your alpaca wool experience?" readonly></textarea>
-                        </div>
-                        <button type="button" class="form-button">Submit Review (Demo Only)</button>
-                    </form>
-                </div>
+    <div>
+      <label>Server:</label>
+      <input type="radio" id="server-local" name="server" value="local" title="local"/>
+      <label for="server-local">Local</label>
+      <input type="radio" id="server-prod" name="server" value="prod" checked title="prod"/>
+      <label for="server-prod">Production</label>
+    </div>
 
-                <div class="form-card">
-                    <h3>Alpaca Adoption Application</h3>
-                    <p>Apply to virtually adopt one of our premium alpacas for a year of wool benefits.</p>
-                    <div class="form-status status-draft">Draft</div>
+    <div>
+      <label for="asset_source">Asset Source:</label>
+      <input type="text" id="asset_source" name="asset_source" value="" title="Asset Source"/>
+    </div>
 
-                    <form style="margin-top: 2rem;">
-                        <div class="form-group">
-                            <label>Preferred Alpaca Name</label>
-                            <select disabled>
-                                <option>Fernando the Magnificent</option>
-                                <option>Isabella the Elegant</option>
-                                <option>Carlos the Cuddly</option>
-                                <option>Sophia the Soft</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Experience Level</label>
-                            <select disabled>
-                                <option>First-time Alpaca Enthusiast</option>
-                                <option>Casual Wool Collector</option>
-                                <option>Serious Alpaca Investor</option>
-                                <option>Professional Fiber Expert</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Why do you want to adopt an alpaca?</label>
-                            <textarea rows="3" placeholder="Share your alpaca dreams..." readonly></textarea>
-                        </div>
-                        <button type="button" class="form-button">Apply (Demo Only)</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div>
+      <label title="Environment from which to load full-forms data">Forms Type:</label>
+      <input type="radio" id="form-type-in-app" name="form-type" value="in-app" checked title="In-App"/>
+      <label for="form-type-in-app">In-App</label>
+      <input type="radio" id="form-type-web" name="form-type" value="web" title="Web"/>
+      <label for="form-type-web">Web</label>
+    </div>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Luxe Llama Co. - Sustainably Luxurious Since Never | <a href="disclaimer.html" style="color: #c9a96e;">Disclaimer</a></p>
-            <div style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.7;">
-                <p>Testing Links:
-                    <a href=".well-known/apple-app-site-association" style="color: #c9a96e; margin: 0 0.5rem;">AASA File</a> |
-                    <a href=".well-known/assetlinks.json" style="color: #c9a96e; margin: 0 0.5rem;">App Links</a>
-                </p>
-            </div>
-        </div>
-    </footer>
+    <div>
+      <label title="Whether to allow client/* API calls">Tracking:</label>
+      <input type="radio" id="tracking-1" name="local-tracking" value="1" checked title="API calls blocked"/>
+      <label for="tracking-1">Block API calls</label>
+      <input type="radio" id="tracking-0" name="local-tracking" value="0" title="API calls permitted"/>
+      <label for="tracking-0">Allow</label>
+    </div>
+
+    <div>
+      <button id="trigger"
+              type="submit"
+              title="Load klaviyo.js and trigger a form">
+        Load Klaviyo.js
+      </button>
+    </div>
+
+    <div>
+      <button id="clear"
+              type="button"
+              onclick="iafReset()"
+              title="Clear klaviyoOnsite from localStorage and klaviyoFormSetting from sessionStorage">
+        Reset
+      </button>
+    </div>
+  </form>
+</div>
+
+<div>
+  <div id="profileEventTester">
+    <div class="form-caption">
+      Test triggering forms by profile events.<br/>
+      Enter an event name and properties to simulate a profile event.
+    </div>
+    <div>
+      <label for="profile_event_name">Event Name:</label>
+      <input type="text" id="profile_event_name" name="profile_event_name" value="Viewed Product" title="Profile Event Name"/>
+    </div>
+
+    <div>
+      <label for="profile_event_properties">Event Properties (JSON):</label>
+      <textarea id="profile_event_properties" name="profile_event_properties" rows="4" cols="50" title="Profile Event Properties as JSON">{}</textarea>
+    </div>
+
+    <div>
+      <button id="triggerProfileEvent"
+              type="button"
+              onclick="triggerProfileEvent()"
+              title="Trigger profile event">
+        Trigger Profile Event
+      </button>
+    </div>
+  </div>
+</div>
+
+<div>
+  Some commands can't be tested from the UI without conflicting with the displayed form.<br/>
+  Open the JS console for further instructions!
+</div>
+<h2 style="font-family: monospace">NativeBridge Messages:</h2>
+<pre id="log">
+</pre>
+
 </body>
 </html>
