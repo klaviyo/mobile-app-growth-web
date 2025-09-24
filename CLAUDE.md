@@ -21,12 +21,18 @@
 
 ## Build & Deployment
 - Deployed via Netlify
-- Auto-deploy from git repository commits to main branch
+- Auto-deploy from git repository commits to main branch (via PR merge)
 - No build process required (static HTML)
 - DNS managed through Squarespace Domains
 
+## Development Workflow
+- **Work in the 'ecm' branch** - Never commit directly to main branch
+- Use PR workflow to deploy: create pull requests from 'ecm' → main
+- Only merge PRs when ready to deploy to Netlify (to control deploy frequency)
+- Claude can help write PR descriptions in GitHub UI
+
 ## Common Commands
-- `git add . && git commit -m "message" && git push` - Deploy changes
+- `git add . && git commit -m "message" && git push` - Push changes to ecm branch
 - Local testing: Open HTML files directly in browser or use simple HTTP server
 
 ## Notes
