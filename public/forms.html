@@ -110,23 +110,27 @@
       return true
     }
 
-    function profileEvent(metric, strProperties) {
+    function dispatchProfileEvent(metric, time, strProperties) {
+      const event = {
+        metric: metric,
+        time: time,
+        value: Math.random() * 100,
+        unique_id: crypto.randomUUID(),
+        properties: JSON.parse(strProperties)
+      }
+
+      logBridgeMessage(`// Dispatching profile event: ${metric}: ${event}`);
+
       document.head.dispatchEvent(
         new CustomEvent(
           'profileEvent',
           {
-            detail: {
-              metric: metric,
-              properties: JSON.parse(strProperties)
-            }
+            detail: event
           }
         )
       )
       return true
     }
-
-    // Make profileEvent available globally
-    window.profileEvent = profileEvent;
 
     if (!window._learnq)
       window._learnq = []
@@ -135,6 +139,8 @@
     const timeout = 10
     const nativeBridgeName = document.head.getAttribute("data-native-bridge-name");
     let handShakeTimeout;
+    let handShook = false;
+    const profileEventsBuffer = []
 
     //Add native bridge handshake data from JS (easier to visualize/maintain)
     document.head.setAttribute("data-native-bridge-handshake", JSON.stringify([
@@ -161,6 +167,8 @@
         switch (type) {
           case "handShook":
             clearTimeout(handShakeTimeout);
+            handShook = true
+            profileEventsBuffer.forEach((dispatchEvent) => { dispatchEvent() })
             break;
           case "abort":
             clearTimeout(handShakeTimeout);
@@ -180,7 +188,6 @@
     }
 
     function onKlaviyoJsLoaded() {
-      localStorage.debug = "kl_in_app_forms:*"
       updatePageState()
       logIfIdentified()
       if (getAssetSource()) {
@@ -188,11 +195,23 @@
       }
     }
 
+    let timer;
     function triggerForm() {
+      localStorage.debug = getDebugFilter();
+
+      const timerSpan = document.querySelector(".timer");
+      clearInterval(timer);
+      timerSpan.innerText = 0;
+      timer = setInterval(() => {
+        const current = parseInt(timerSpan.innerText) || 0;
+        timerSpan.innerText = current + 1;
+      }, 1000)
+
       const script = document.createElement("script");
       const companyId = getCompanyId();
       let scriptUrl = `${getSelectedServerUrl()}/onsite/js/klaviyo.js?env=in-app&company_id=${companyId}`
       const assetSource = getAssetSource();
+      const debugFilter = getDebugFilter();
       const formType = getSelectedFormType();
       const localTracking = getLocalTracking();
 
@@ -207,6 +226,7 @@
       localStorage.setItem("company_id", companyId);
       localStorage.setItem("server", getSelectedServer());
       localStorage.setItem("asset_source", assetSource);
+      localStorage.setItem("debug_filter", debugFilter);
       localStorage.setItem("form_type", formType);
       localStorage.setItem("local_tracking", localTracking);
 
@@ -241,6 +261,10 @@
       return document.getElementById("asset_source").value;
     }
 
+    function getDebugFilter() {
+      return document.getElementById("debug_filter").value;
+    }
+
     function getSelectedFormType() {
       return document.querySelector('input[name="form-type"]:checked').value;
     }
@@ -266,7 +290,8 @@
       document.getElementById("clear").disabled = document.head.querySelector('#klaviyo-js') === null;
       document.getElementById("company_id").value = localStorage.getItem("company_id");
       document.getElementById(`server-${server}`).checked = true;
-      document.getElementById("asset_source").value = localStorage.getItem("asset_source");
+      document.getElementById("asset_source").value = localStorage.getItem("asset_source") || "";
+      document.getElementById("debug_filter").value = localStorage.getItem("debug_filter") || "kl_in_app_forms:*";
       document.getElementById(`form-type-${formType}`).checked = true;
       document.getElementById(`tracking-${localTracking}`).checked = true;
 
@@ -279,6 +304,11 @@
       document.getElementById("email").value = profileIdentifiers.email || "";
       document.getElementById("phone").value = profileIdentifiers.phone || "";
       document.getElementById("anonymous_id").value = profileIdentifiers.anonymous_id || "";
+
+      const profileEventMetric = localStorage.getItem("profile_event_metric") || "Viewed Product";
+      const profileEventProperties = localStorage.getItem("profile_event_properties") || "{}";
+      document.getElementById("profile_event_metric").value = profileEventMetric;
+      document.getElementById("profile_event_properties").value = profileEventProperties;
     }
 
     function logBridgeMessage(message) {
@@ -318,18 +348,22 @@
     }
 
     function triggerProfileEvent() {
-      const eventName = document.getElementById("profile_event_name").value;
+      const eventMetric = document.getElementById("profile_event_metric").value;
       const eventProperties = document.getElementById("profile_event_properties").value;
-      
+      const time = new Date().toISOString()
+      const dispatchEvent = () => {
+        dispatchProfileEvent(eventMetric, time, eventProperties);
+      }
+
       try {
         // Validate JSON
         JSON.parse(eventProperties);
-        
-        // Trigger the profile event
-        profileEvent(eventName, eventProperties);
-        
-        logBridgeMessage(`// Triggered profile event: ${eventName} with properties: ${eventProperties}`);
-        
+
+        // Save to localStorage
+        localStorage.setItem("profile_event_metric", eventMetric);
+        localStorage.setItem("profile_event_properties", eventProperties);
+
+        handShook ? dispatchEvent() : profileEventsBuffer.push(dispatchEvent);
       } catch (error) {
         alert(`Invalid JSON in properties: ${error.message}`);
       }
@@ -407,6 +441,11 @@
     </div>
 
     <div>
+      <label for="debug_filter">Debug Filter:</label>
+      <input type="text" id="debug_filter" name="debug_filter" value="kl_in_app_forms:*" title="Sets the filter for onsite debug logs"/>
+    </div>
+
+    <div>
       <label title="Environment from which to load full-forms data">Forms Type:</label>
       <input type="radio" id="form-type-in-app" name="form-type" value="in-app" checked title="In-App"/>
       <label for="form-type-in-app">In-App</label>
@@ -428,6 +467,7 @@
               title="Load klaviyo.js and trigger a form">
         Load Klaviyo.js
       </button>
+      <span class="timer"></span>
     </div>
 
     <div>
@@ -445,11 +485,11 @@
   <div id="profileEventTester">
     <div class="form-caption">
       Test triggering forms by profile events.<br/>
-      Enter an event name and properties to simulate a profile event.
+      Enter an event metric and properties to simulate a profile event.
     </div>
     <div>
-      <label for="profile_event_name">Event Name:</label>
-      <input type="text" id="profile_event_name" name="profile_event_name" value="Viewed Product" title="Profile Event Name"/>
+      <label for="profile_event_metric">Event Metric:</label>
+      <input type="text" id="profile_event_metric" name="profile_event_metric" value="Viewed Product" title="Profile Event Metric"/>
     </div>
 
     <div>
