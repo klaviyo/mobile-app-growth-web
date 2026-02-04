@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest"],
+        "appIDs": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest", "G3793W2RJ2.com.klaviyo.flutterexample"],
         "components": [
           {
             "/": "/",
@@ -41,6 +41,14 @@
             "comment": "Matches Settings screen path"
           },
           {
+            "/": "/geofencing",
+            "comment": "Matches Location/Geofencing screen path"
+          },
+          {
+            "/": "/location",
+            "comment": "Matches Location/Geofencing screen path"
+          },
+          {
             "/": "/push",
             "comment": "Matches Push screen path"
           }
@@ -49,6 +57,6 @@
     ]
   },
   "webcredentials": {
-    "apps": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest"]
+    "apps": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest", "G3793W2RJ2.com.klaviyo.flutterexample"]
   }
 }
