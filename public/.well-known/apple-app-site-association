@@ -2,7 +2,7 @@
   "applinks": {
     "details": [
       {
-        "appIDs": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest", "G3793W2RJ2.com.klaviyo.flutterexample"],
+        "appIDs": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest", "G3793W2RJ2.com.klaviyo.FlutterExample"],
         "components": [
           {
             "/": "/",
@@ -57,6 +57,6 @@
     ]
   },
   "webcredentials": {
-    "apps": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest", "G3793W2RJ2.com.klaviyo.flutterexample"]
+    "apps": ["G3793W2RJ2.com.klaviyo.SDKTestApp", "G3793W2RJ2.com.klaviyo.rntest", "G3793W2RJ2.com.klaviyo.FlutterExample"]
   }
 }
