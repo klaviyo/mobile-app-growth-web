@@ -119,7 +119,7 @@
         properties: JSON.parse(strProperties)
       }
 
-      logBridgeMessage(`// Dispatching profile event: ${metric}: ${event}`);
+      logBridgeMessage(`// Dispatching profile event: ${metric}: ${JSON.stringify(event)}`);
 
       document.head.dispatchEvent(
         new CustomEvent(
