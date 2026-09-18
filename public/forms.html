@@ -142,6 +142,12 @@
     let handShook = false;
     const profileEventsBuffer = []
 
+    // Set ?trackProfileEvent=2 to advertise v2 (nested properties only).
+    // Default v1 also hoists the properties to the top level of `data`.
+    const trackProfileEventVersion = Number(
+      new URLSearchParams(window.location.search).get("trackProfileEvent")
+    ) || 1;
+
     //Add native bridge handshake data from JS (easier to visualize/maintain)
     document.head.setAttribute("data-native-bridge-handshake", JSON.stringify([
       {type: "handShook", version: 1},
@@ -150,7 +156,7 @@
       {type: "formWillAppear", version: 2},
       {type: "openDeepLink", version: 2},
       {type: "trackAggregateEvent", version: 1},
-      {type: "trackProfileEvent", version: 1},
+      {type: "trackProfileEvent", version: trackProfileEventVersion},
       {type: "formDisappeared", version: 1},
       {type: "profileMutation", version: 1},
       {type: "lifecycleEvent" , version: 1},
@@ -177,6 +183,18 @@
             break;
           case "formWillAppear":
             window.formId = data.formId;
+            break;
+          case "BadJWT":
+            // Simulate the native SDK responding to a 401 by pushing a fresh
+            // token. In a real app the SDK fetches a new JWT from the server;
+            // here we generate a new fake one so the lifecycle loop completes.
+            // To test actual 401 recovery with a real JWT, use the custom token
+            // field — the SDK response here will be overridden by that value.
+            setTimeout(() => {
+              document.getElementById("jwt_custom").value = "";
+              setJwtAttribute();
+              logBridgeMessage("// Auto-responded to BadJWT with fresh token");
+            }, 100);
             break;
         }
       }
@@ -292,7 +310,7 @@
       document.getElementById("company_id").value = localStorage.getItem("company_id");
       document.getElementById(`server-${server}`).checked = true;
       document.getElementById("asset_source").value = localStorage.getItem("asset_source") || "";
-      document.getElementById("debug_filter").value = localStorage.getItem("debug_filter") || "kl_in_app_forms:*";
+      document.getElementById("debug_filter").value = localStorage.getItem("debug_filter") || "kl_in_app_forms:*,kl_onsite_personalization:*";
       document.getElementById(`form-type-${formType}`).checked = true;
       document.getElementById(`tracking-${localTracking}`).checked = true;
 
@@ -310,6 +328,9 @@
       const profileEventProperties = localStorage.getItem("profile_event_properties") || "{}";
       document.getElementById("profile_event_metric").value = profileEventMetric;
       document.getElementById("profile_event_properties").value = profileEventProperties;
+
+      document.getElementById("jwt_ttl").value = localStorage.getItem("jwt_ttl") || "120";
+      updateJwtStatus();
     }
 
     function logBridgeMessage(message) {
@@ -346,6 +367,122 @@
           logBridgeMessage(`// Profile cookied: ${window._learnq.isIdentified()}`);
         }
       }, 100);
+    }
+
+    // -----------------------------------------------------------------------
+    // JWT / personalization tester
+    // -----------------------------------------------------------------------
+
+    let jwtCountdownTimer;
+    let jwtAutoRotateTimer;
+
+    function base64UrlEncode(obj) {
+      return btoa(JSON.stringify(obj))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=/g, "");
+    }
+
+    // Unsigned token — claims are all the JS layer parses, so this exercises
+    // the full provider/refresh/expiry lifecycle. Use a real token (custom
+    // field) to test actual Profiles API fetches and 401 → BAD_JWT.
+    function generateFakeJwt(ttlSeconds) {
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const header = base64UrlEncode({alg: "HS256", typ: "JWT"});
+      const payload = base64UrlEncode({
+        iat: nowSeconds,
+        exp: nowSeconds + ttlSeconds,
+        sub: "iaf-tester",
+      });
+      return `${header}.${payload}.${crypto.randomUUID().replace(/-/g, "")}`;
+    }
+
+    function getJwtTtlSeconds() {
+      return parseInt(document.getElementById("jwt_ttl").value, 10) || 120;
+    }
+
+    function buildJwtFromInputs() {
+      const customToken = document.getElementById("jwt_custom").value.trim();
+      return customToken || generateFakeJwt(getJwtTtlSeconds());
+    }
+
+    function setJwtAttribute() {
+      const token = buildJwtFromInputs();
+      localStorage.setItem("jwt_ttl", getJwtTtlSeconds());
+      document.head.setAttribute("data-klaviyo-jwt", token);
+      logBridgeMessage(`// Set data-klaviyo-jwt: ${token.slice(0, 40)}…`);
+      updateJwtStatus();
+    }
+
+    function clearJwtAttribute() {
+      stopJwtAutoRotate();
+      document.getElementById("jwt_auto_rotate").checked = false;
+      document.head.removeAttribute("data-klaviyo-jwt");
+      logBridgeMessage("// Removed data-klaviyo-jwt attribute");
+      updateJwtStatus();
+    }
+
+    // Simulates a real SDK that refreshes its token on its own schedule:
+    // rewrites the attribute with a fresh fake token shortly before each
+    // expiry, so the JS layer's 90%-lifetime refresh pull finds a new value.
+    function toggleJwtAutoRotate() {
+      if (document.getElementById("jwt_auto_rotate").checked) {
+        const rotateEveryMs = Math.max(getJwtTtlSeconds() * 0.8, 5) * 1000;
+        setJwtAttribute();
+        jwtAutoRotateTimer = setInterval(() => {
+          document.getElementById("jwt_custom").value = "";
+          setJwtAttribute();
+        }, rotateEveryMs);
+        logBridgeMessage(`// Auto-rotating JWT every ${rotateEveryMs / 1000}s`);
+      } else {
+        stopJwtAutoRotate();
+        logBridgeMessage("// Stopped auto-rotating JWT");
+      }
+    }
+
+    function stopJwtAutoRotate() {
+      clearInterval(jwtAutoRotateTimer);
+      jwtAutoRotateTimer = undefined;
+    }
+
+    function decodeJwtClaims(token) {
+      try {
+        const payload = token.split(".")[1]
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
+        return JSON.parse(atob(payload));
+      } catch {
+        return null;
+      }
+    }
+
+    function updateJwtStatus() {
+      const statusSpan = document.getElementById("jwt_status");
+      clearInterval(jwtCountdownTimer);
+
+      const token = document.head.getAttribute("data-klaviyo-jwt");
+      if (!token) {
+        statusSpan.innerText = "no data-klaviyo-jwt attribute set";
+        return;
+      }
+
+      const claims = decodeJwtClaims(token);
+      if (!claims || !claims.exp) {
+        statusSpan.innerText = "attribute set, but payload is not decodable JWT claims";
+        return;
+      }
+
+      const render = () => {
+        const secondsLeft = Math.round(claims.exp - Date.now() / 1000);
+        const lifecycle = secondsLeft <= 0
+          ? "EXPIRED"
+          : secondsLeft <= 30
+            ? `${secondsLeft}s left (inside 30s leeway — JS treats as expired)`
+            : `${secondsLeft}s until exp`;
+        statusSpan.innerText = `iat=${claims.iat ?? "MISSING"} exp=${claims.exp} — ${lifecycle}`;
+      };
+      render();
+      jwtCountdownTimer = setInterval(render, 1000);
     }
 
     function triggerProfileEvent() {
@@ -443,7 +580,7 @@
 
     <div>
       <label for="debug_filter">Debug Filter:</label>
-      <input type="text" id="debug_filter" name="debug_filter" value="kl_in_app_forms:*" title="Sets the filter for onsite debug logs"/>
+      <input type="text" id="debug_filter" name="debug_filter" value="kl_in_app_forms:*,kl_onsite_personalization:*" title="Sets the filter for onsite debug logs"/>
     </div>
 
     <div>
@@ -505,6 +642,54 @@
               title="Trigger profile event">
         Trigger Profile Event
       </button>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div id="jwtTester">
+    <div class="form-caption" style="height: auto; max-width: 480px">
+      Test the personalization JWT lifecycle by simulating the native SDK writing
+      <code>data-klaviyo-jwt</code>. Generate a fake token (claims only — fine for
+      timer/refresh testing) or paste a real one to exercise the Profiles API.
+      Watch <code>kl_onsite_personalization:*</code> console logs and BAD_JWT bridge messages.
+    </div>
+    <div>
+      <label for="jwt_ttl">Token TTL (s):</label>
+      <input type="number" id="jwt_ttl" name="jwt_ttl" value="120" min="5" title="Lifetime of generated fake tokens in seconds"/>
+    </div>
+
+    <div>
+      <label for="jwt_custom">Custom JWT:</label>
+      <textarea id="jwt_custom" name="jwt_custom" rows="3" cols="50" title="Optional: paste a real JWT; leave empty to generate a fake one" placeholder="Leave empty to generate a fake token"></textarea>
+    </div>
+
+    <div>
+      <label for="jwt_auto_rotate">Auto-rotate:</label>
+      <input type="checkbox" id="jwt_auto_rotate" name="jwt_auto_rotate" onchange="toggleJwtAutoRotate()" title="Rewrite the attribute with a fresh fake token at 80% of TTL, like a real SDK refreshing"/>
+    </div>
+
+    <div>
+      <button id="setJwt"
+              type="button"
+              onclick="setJwtAttribute()"
+              title="Write the token to data-klaviyo-jwt (set or rotate)">
+        Set / Rotate JWT Attribute
+      </button>
+    </div>
+
+    <div>
+      <button id="clearJwt"
+              type="button"
+              onclick="clearJwtAttribute()"
+              title="Remove the data-klaviyo-jwt attribute">
+        Clear JWT Attribute
+      </button>
+    </div>
+
+    <div>
+      <label>JWT status:</label>
+      <span id="jwt_status" style="font-family: monospace">no data-klaviyo-jwt attribute set</span>
     </div>
   </div>
 </div>
