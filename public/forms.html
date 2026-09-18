@@ -190,6 +190,10 @@
             // here we generate a new fake one so the lifecycle loop completes.
             // To test actual 401 recovery with a real JWT, use the custom token
             // field — the SDK response here will be overridden by that value.
+            if (!jwtAutoRespondEnabled()) {
+              logBridgeMessage("// BadJWT auto-responder is off — not pushing a fresh token");
+              break;
+            }
             setTimeout(() => {
               document.getElementById("jwt_custom").value = "";
               setJwtAttribute();
@@ -330,6 +334,7 @@
       document.getElementById("profile_event_properties").value = profileEventProperties;
 
       document.getElementById("jwt_ttl").value = localStorage.getItem("jwt_ttl") || "120";
+      document.getElementById("jwt_auto_respond").checked = jwtAutoRespondEnabled();
       updateJwtStatus();
     }
 
@@ -375,6 +380,16 @@
 
     let jwtCountdownTimer;
     let jwtAutoRotateTimer;
+
+    function jwtAutoRespondEnabled() {
+      return localStorage.getItem("jwt_auto_respond") !== "0";
+    }
+
+    function toggleJwtAutoRespond() {
+      const enabled = document.getElementById("jwt_auto_respond").checked;
+      localStorage.setItem("jwt_auto_respond", enabled ? "1" : "0");
+      logBridgeMessage(`// BadJWT auto-responder ${enabled ? "enabled" : "disabled"}`);
+    }
 
     function base64UrlEncode(obj) {
       return btoa(JSON.stringify(obj))
@@ -667,6 +682,11 @@
     <div>
       <label for="jwt_auto_rotate">Auto-rotate:</label>
       <input type="checkbox" id="jwt_auto_rotate" name="jwt_auto_rotate" onchange="toggleJwtAutoRotate()" title="Rewrite the attribute with a fresh fake token at 80% of TTL, like a real SDK refreshing"/>
+    </div>
+
+    <div>
+      <label for="jwt_auto_respond">BadJWT auto-responder:</label>
+      <input type="checkbox" id="jwt_auto_respond" name="jwt_auto_respond" onchange="toggleJwtAutoRespond()" checked title="Automatically answer BadJWT bridge messages by pushing a fresh token. Turn off to simulate an SDK with no JWT handler registered, so the 401 goes unrecovered."/>
     </div>
 
     <div>
