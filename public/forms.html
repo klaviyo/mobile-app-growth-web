@@ -382,7 +382,7 @@
     let jwtAutoRotateTimer;
 
     function jwtAutoRespondEnabled() {
-      return localStorage.getItem("jwt_auto_respond") !== "0";
+      return localStorage.getItem("jwt_auto_respond") === "1";
     }
 
     function toggleJwtAutoRespond() {
@@ -686,7 +686,7 @@
 
     <div>
       <label for="jwt_auto_respond">BadJWT auto-responder:</label>
-      <input type="checkbox" id="jwt_auto_respond" name="jwt_auto_respond" onchange="toggleJwtAutoRespond()" checked title="Automatically answer BadJWT bridge messages by pushing a fresh token. Turn off to simulate an SDK with no JWT handler registered, so the 401 goes unrecovered."/>
+      <input type="checkbox" id="jwt_auto_respond" name="jwt_auto_respond" onchange="toggleJwtAutoRespond()" title="Automatically answer BadJWT bridge messages by pushing a fresh token. Turn off to simulate an SDK with no JWT handler registered, so the 401 goes unrecovered."/>
     </div>
 
     <div>
