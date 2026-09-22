@@ -51,6 +51,10 @@
           {
             "/": "/push",
             "comment": "Matches Push screen path"
+          },
+          {
+            "/": "/oauth/callback",
+            "comment": "Matches the hosted OAuth authorization redirect (ASWebAuthenticationSession callback)"
           }
         ]
       }
