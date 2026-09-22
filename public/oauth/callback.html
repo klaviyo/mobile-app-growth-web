@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #faf9f7;
+            color: #333;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 480px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin-bottom: 0.75rem;
+            color: #5a4a3a;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        code {
+            background: #f0efec;
+            padding: 0.1rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f0efec;
+            border-radius: 6px;
+            text-align: left;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>OAuth callback received</h1>
+        <p>
+            This page is the redirect target for Klaviyo's hosted OAuth authorization flow, used by
+            the mobile test apps' universal-link (<code>ASWebAuthenticationSession</code>) integration.
+            If you're seeing this rendered instead of returning straight to the app, either the app
+            isn't installed on this device or the redirect wasn't intercepted as a universal link
+            &mdash; you can close this window.
+        </p>
+        <pre id="params"></pre>
+    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        if (params.toString()) {
+            const pre = document.getElementById('params');
+            pre.textContent = Array.from(params.entries())
+                .map(([key, value]) => `${key}: ${value}`)
+                .join('\n');
+            pre.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
